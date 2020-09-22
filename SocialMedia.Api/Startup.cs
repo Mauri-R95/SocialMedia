@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Infrastructure.Data;
+using SocialMedia.Infrastructure.Filters;
 using SocialMedia.Infrastructure.Repositories;
 
 namespace SocialMedia.Api
@@ -29,12 +32,30 @@ namespace SocialMedia.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddControllers().AddNewtonsoftJson(o =>
+            {
+                o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            })
+                .ConfigureApiBehaviorOptions(o => 
+                {
+                    //o.SuppressModelStateInvalidFilter = true;                 
+                });
+
+            //services.AddControllers();
             services.AddDbContext<SocialMediaContext>(o => o.UseSqlServer(Configuration.GetConnectionString("SocialMedia")));
             // 
             //services.AddTransient<IPostRepository, PostMongoRepository>(); para cambiar el acceso a BD y hacerlo mas escalable
             services.AddTransient<IPostRepository, PostRepository>();
-
+            //Agregar un filtro de forma global
+            services.AddMvc(o =>
+            {
+                o.Filters.Add<ValidationFilter>();
+            }).AddFluentValidation(o => 
+            {
+                //Registramos los Validator de Fluent Validator
+                o.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
