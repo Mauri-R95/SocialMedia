@@ -50,6 +50,8 @@ namespace SocialMedia.Api
             services.AddTransient<IPostService, PostService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IPostRepository, PostRepository>();
+            services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
             //Agregar un filtro de forma global
             services.AddMvc(o =>
             {

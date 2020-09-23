@@ -22,7 +22,7 @@ namespace SocialMedia.Infrastructure.Repositories
 
         public async Task<User> GetUser(int id)
         {
-            var user = await _socialMediaContext.Users.FirstOrDefaultAsync(x => x.UserId == id);
+            var user = await _socialMediaContext.Users.FirstOrDefaultAsync(x => x.Id == id);
             return user;
         }
     }
