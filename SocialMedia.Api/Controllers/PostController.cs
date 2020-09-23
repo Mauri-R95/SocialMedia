@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
@@ -19,6 +20,7 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.Api.Controllers
 {
+    [Authorize]
     [Produces("application/json")] // para ver el tipo de salida en el swagger
     //al utilizar new alta dependencia, utilizar inyeccion de dependencia
     [Route("api/[controller]")]
