@@ -1,23 +1,21 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.Services;
 using SocialMedia.Infrastructure.Data;
 using SocialMedia.Infrastructure.Filters;
+using SocialMedia.Infrastructure.Interfaces;
 using SocialMedia.Infrastructure.Repositories;
+using SocialMedia.Infrastructure.Services;
+using System;
 
 namespace SocialMedia.Api
 {
@@ -40,12 +38,14 @@ namespace SocialMedia.Api
             }).AddNewtonsoftJson(o =>
             {
                 o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                o.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore; //para ignorar los nulos de los responses
             })
-                .ConfigureApiBehaviorOptions(o => 
-                {
-                    //o.SuppressModelStateInvalidFilter = true;                 
-                });
-
+            .ConfigureApiBehaviorOptions(o => 
+            {
+                //o.SuppressModelStateInvalidFilter = true;                 
+            });
+            //configuracion por defecto de las paginas por si el usuario no ingresa paginacion
+            services.Configure<PaginationOptions>(Configuration.GetSection("Pagination"));
             //services.AddControllers();
             services.AddDbContext<SocialMediaContext>(o => o.UseSqlServer(Configuration.GetConnectionString("SocialMedia")));
             // 
@@ -55,6 +55,13 @@ namespace SocialMedia.Api
             services.AddTransient<IPostRepository, PostRepository>();
             services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IUriService>(provider =>
+            {
+                var accesor = provider.GetRequiredService<IHttpContextAccessor>(); // queremos obtener la instancia del objeto HTTP
+                var request = accesor.HttpContext.Request; //obtener el request que nos genera
+                var absoluteUri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent()); // define la URL Base 
+                return new UriService(absoluteUri); // Incorpora la URL base al UriService
+            });
             //Agregar un filtro de forma global
             services.AddMvc(o =>
             {
