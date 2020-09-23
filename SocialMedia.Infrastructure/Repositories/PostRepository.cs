@@ -10,49 +10,14 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.Infrastructure.Repositories
 {
-    public class PostRepository : IPostRepository
+    public class PostRepository : BaseRepository<Post>,  IPostRepository 
     {
         private readonly SocialMediaContext _socialMediaContext;
-        public PostRepository(SocialMediaContext socialMediaContext)
-        {
-            _socialMediaContext = socialMediaContext;
-        }
-        public async Task<IEnumerable<Post>> GetPosts()
-        {
-            var posts = await _socialMediaContext.Posts.ToListAsync();
-            return posts;
-        }
+        public PostRepository(SocialMediaContext socialMediaContext) : base(socialMediaContext) { }
 
-        public async Task<Post> GetPost(int id)
+        public async Task<IEnumerable<Post>> GetPostsByUser(int userId)
         {
-            var post = await _socialMediaContext.Posts.FirstOrDefaultAsync(x => x.Id == id);
-            return post;
-        }
-        public async Task InsertPost(Post post)
-        {
-            _socialMediaContext.Posts.Add(post);
-            await _socialMediaContext.SaveChangesAsync();
-            //var post = await _socialMediaContext.Posts.FirstOrDefaultAsync(x => x.PostId == id);
-            //return post;
-        }
-
-        public async Task<bool> UpdatePost(Post post)
-        {
-            var currentPost = await GetPost(post.Id);
-            currentPost.Date = post.Date;
-            currentPost.Description = post.Description;
-            currentPost.Image = post.Image;
-            int rows = await _socialMediaContext.SaveChangesAsync();
-            return rows > 0;
-        }
-
-        public async Task<bool> DeletePost(int id)
-        {
-            var currentPost = await GetPost(id);
-            _socialMediaContext.Posts.Remove(currentPost);
-
-            int rows = await _socialMediaContext.SaveChangesAsync();
-            return rows > 0;
+            return await _entities.Where(x => x.UserId == userId).ToListAsync();
         }
     }
 }
