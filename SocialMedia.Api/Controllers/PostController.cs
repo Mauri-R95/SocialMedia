@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 
 namespace SocialMedia.Api.Controllers
 {
+    [Produces("application/json")] // para ver el tipo de salida en el swagger
     //al utilizar new alta dependencia, utilizar inyeccion de dependencia
     [Route("api/[controller]")]
     [ApiController] // nos permite trabajar con API RESTFul, agrega una cantidad de validaciones y features
@@ -36,9 +37,13 @@ namespace SocialMedia.Api.Controllers
             _mapper = mapper;
             _uriService = uriService;
         }
-
+        /// <summary>
+        /// Retrieve All posts
+        /// </summary>
+        /// <param name="filters">Filter to apply</param>
+        /// <returns></returns>
         [HttpGet(Name = nameof(GetPosts))]
-        [ProducesResponseType((int)HttpStatusCode.OK/*, Type = typeof(ApiResponse<IEnumerable<PostDto>>)*/)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(ApiResponse<IEnumerable<PostDto>>))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest/*, Type = typeof(ApiResponse<IEnumerable<PostDto>>)*/)]
         //los ? los hace nulleables
         //si se manejan mas de 3 parametros encapsular esos valores dentro de un objeto
@@ -67,7 +72,7 @@ namespace SocialMedia.Api.Controllers
             //return response;
         }
 
-        [HttpGet("{Id}")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetPost(int id)
         {
             var post = await _postService.GetPost(id);
