@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json;
 using SocialMedia.Api.Responses;
+using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
@@ -38,14 +40,26 @@ namespace SocialMedia.Api.Controllers
         //los ? los hace nulleables
         //si se manejan mas de 3 parametros encapsular esos valores dentro de un objeto
         //[FromQuery] para mappiar los datos que vienen en la URL
-        //public IActionResult GetPosts([FromQuery]PostQueryFilter filters)
-        public ActionResult<ApiResponse<IEnumerable<PostDto>>> GetPosts([FromQuery]PostQueryFilter filters)
+        public IActionResult GetPosts([FromQuery]PostQueryFilter filters)
+        //public ActionResult<ApiResponse<IEnumerable<PostDto>>> GetPosts([FromQuery]PostQueryFilter filters)
         {
             var posts = _postService.GetPosts(filters);
             var postsDto = _mapper.Map<IEnumerable<PostDto>>(posts);
             var response = new ApiResponse<IEnumerable<PostDto>>(postsDto);
-            return response;
-            //return Ok(response);
+            //return response;
+            //paginacion
+            var metadata = new
+            {
+                posts.TotalCount, //cantidad total de elementos
+                posts.PageSize, 
+                posts.CurrentPage,
+                posts.TotalPages,
+                posts.HasNextPage,
+                posts.HasPreviousPage
+               
+            };
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            return Ok(response);
         }
 
         [HttpGet("{Id}")]
