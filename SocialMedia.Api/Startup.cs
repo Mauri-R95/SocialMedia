@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -13,7 +12,7 @@ using Microsoft.OpenApi.Models;
 using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.Services;
-using SocialMedia.Infrastructure.Data;
+using SocialMedia.Infrastructure.Extensions;
 using SocialMedia.Infrastructure.Filters;
 using SocialMedia.Infrastructure.Interfaces;
 using SocialMedia.Infrastructure.Options;
@@ -51,37 +50,12 @@ namespace SocialMedia.Api
             {
                 //o.SuppressModelStateInvalidFilter = true;                 
             });
-            //configuracion por defecto de las paginas por si el usuario no ingresa paginacion
-            services.Configure<PaginationOptions>(Configuration.GetSection("Pagination"));
-            //Configuracion de las contraseñas y los hashing
-            services.Configure<PasswordOptions>(Configuration.GetSection("PasswordOptions"));
-            //services.AddControllers();
-            services.AddDbContext<SocialMediaContext>(o => o.UseSqlServer(Configuration.GetConnectionString("SocialMedia")));
-            // 
-            //services.AddTransient<IPostRepository, PostMongoRepository>(); para cambiar el acceso a BD y hacerlo mas escalable
-            services.AddTransient<IPostService, PostService>();
-            services.AddTransient<ISecurityService, SecurityService>();
-            services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IPostRepository, PostRepository>();
-            services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
-            services.AddTransient<IUnitOfWork, UnitOfWork>();
-            //Agregar el servicio de infraestructura de password
-            services.AddSingleton<IPasswordService, PasswordService>();
-            services.AddSingleton<IUriService>(provider =>
-            {
-                var accesor = provider.GetRequiredService<IHttpContextAccessor>(); // queremos obtener la instancia del objeto HTTP
-                var request = accesor.HttpContext.Request; //obtener el request que nos genera
-                var absoluteUri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent()); // define la URL Base 
-                return new UriService(absoluteUri); // Incorpora la URL base al UriService
-            });
-            //Swagger
-            services.AddSwaggerGen(o =>
-            {
-                o.SwaggerDoc("v1", new OpenApiInfo { Title = "Social Media API", Version = "v1" });
-                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                o.IncludeXmlComments(xmlPath);
-            });
+            //services.AddOptions(Configuration).AddDbContexts(Configuration); // Encadenamiento de metodos que igual es factible
+            //se ve mas ordenado asi
+            services.AddOptions(Configuration);
+            services.AddDbContexts(Configuration);
+            services.AddServices();
+            services.AddSwagger($"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
             //Agregar autentication JWT
             services.AddAuthentication(o =>
                 {
