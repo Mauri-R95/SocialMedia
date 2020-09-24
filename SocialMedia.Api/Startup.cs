@@ -16,6 +16,7 @@ using SocialMedia.Core.Services;
 using SocialMedia.Infrastructure.Data;
 using SocialMedia.Infrastructure.Filters;
 using SocialMedia.Infrastructure.Interfaces;
+using SocialMedia.Infrastructure.Options;
 using SocialMedia.Infrastructure.Repositories;
 using SocialMedia.Infrastructure.Services;
 using System;
@@ -52,6 +53,8 @@ namespace SocialMedia.Api
             });
             //configuracion por defecto de las paginas por si el usuario no ingresa paginacion
             services.Configure<PaginationOptions>(Configuration.GetSection("Pagination"));
+            //Configuracion de las contraseñas y los hashing
+            services.Configure<PasswordOptions>(Configuration.GetSection("PasswordOptions"));
             //services.AddControllers();
             services.AddDbContext<SocialMediaContext>(o => o.UseSqlServer(Configuration.GetConnectionString("SocialMedia")));
             // 
@@ -62,6 +65,8 @@ namespace SocialMedia.Api
             services.AddTransient<IPostRepository, PostRepository>();
             services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
+            //Agregar el servicio de infraestructura de password
+            services.AddSingleton<IPasswordService, PasswordService>();
             services.AddSingleton<IUriService>(provider =>
             {
                 var accesor = provider.GetRequiredService<IHttpContextAccessor>(); // queremos obtener la instancia del objeto HTTP
