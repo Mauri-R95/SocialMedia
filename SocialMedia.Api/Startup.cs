@@ -57,6 +57,7 @@ namespace SocialMedia.Api
             // 
             //services.AddTransient<IPostRepository, PostMongoRepository>(); para cambiar el acceso a BD y hacerlo mas escalable
             services.AddTransient<IPostService, PostService>();
+            services.AddTransient<ISecurityService, SecurityService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IPostRepository, PostRepository>();
             services.AddScoped(typeof(IRepository<>), typeof(BaseRepository<>));

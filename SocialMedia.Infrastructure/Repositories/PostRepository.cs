@@ -12,7 +12,7 @@ namespace SocialMedia.Infrastructure.Repositories
 {
     public class PostRepository : BaseRepository<Post>,  IPostRepository 
     {
-        private readonly SocialMediaContext _socialMediaContext;
+        //private readonly SocialMediaContext _socialMediaContext;
         public PostRepository(SocialMediaContext socialMediaContext) : base(socialMediaContext) { }
 
         public async Task<IEnumerable<Post>> GetPostsByUser(int userId)
