@@ -18,6 +18,7 @@ using SocialMedia.Infrastructure.Interfaces;
 using SocialMedia.Infrastructure.Options;
 using SocialMedia.Infrastructure.Repositories;
 using SocialMedia.Infrastructure.Services;
+using StackExchange.Redis;
 using System;
 using System.IO;
 using System.Reflection;
@@ -54,7 +55,9 @@ namespace SocialMedia.Api
             //se ve mas ordenado asi
             services.AddOptions(Configuration);
             services.AddDbContexts(Configuration);
+            services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
             services.AddServices();
+            
             services.AddSwagger($"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
             //Agregar autentication JWT
             services.AddAuthentication(o =>

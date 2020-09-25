@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.Services;
+using SocialMedia.Infrastructure.BackgroundTasks;
 using SocialMedia.Infrastructure.Data;
 using SocialMedia.Infrastructure.Interfaces;
 using SocialMedia.Infrastructure.Options;
@@ -49,6 +50,9 @@ namespace SocialMedia.Infrastructure.Extensions
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             //Agregar el servicio de infraestructura de password
             services.AddSingleton<IPasswordService, PasswordService>();
+            //Agrega el servicio de Redis Cache
+            services.AddSingleton<ICacheService, RedisCacheService>();
+            services.AddHostedService<RedisSubcriber>();
             services.AddSingleton<IUriService>(provider =>
             {
                 var accesor = provider.GetRequiredService<IHttpContextAccessor>(); // queremos obtener la instancia del objeto HTTP
