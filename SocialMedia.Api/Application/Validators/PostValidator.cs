@@ -1,10 +1,8 @@
 ﻿using FluentValidation;
-using SocialMedia.Core.DTOs;
+using SocialMedia.Api.Application.Model;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace SocialMedia.Infrastructure.Validators
+namespace SocialMedia.Api.Application.Validations
 {
     //implementa el paquete fluentValidation para validar los modelos DTO antes de entrar a los repositories
     public class PostValidator : AbstractValidator<PostDto>

@@ -1,26 +1,20 @@
 using AutoMapper;
 using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using SocialMedia.Core.CustomEntities;
-using SocialMedia.Core.Interfaces;
-using SocialMedia.Core.Services;
-using SocialMedia.Infrastructure.Extensions;
+using SocialMedia.Api.Application.Queries;
+using SocialMedia.Api.Extensions;
+using SocialMedia.Api.Mappings;
+using SocialMedia.Infrastructure.Data;
 using SocialMedia.Infrastructure.Filters;
-using SocialMedia.Infrastructure.Interfaces;
-using SocialMedia.Infrastructure.Options;
-using SocialMedia.Infrastructure.Repositories;
-using SocialMedia.Infrastructure.Services;
 using StackExchange.Redis;
 using System;
-using System.IO;
 using System.Reflection;
 using System.Text;
 
@@ -36,9 +30,12 @@ namespace SocialMedia.Api
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
+        //public virtual IServiceProvider ConfigureServices(IServiceCollection services)
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            services.AddAutoMapper(cfg => { cfg.AddProfile<AutomapperProfile>();});
+            services.AddTransient<IPostQueries, PostQueries>();
             services.AddControllers(o => 
             {
                 o.Filters.Add<GlobalExceptionFilter>();
@@ -57,7 +54,10 @@ namespace SocialMedia.Api
             services.AddDbContexts(Configuration);
             services.AddSingleton<IConnectionMultiplexer>(x => ConnectionMultiplexer.Connect(Configuration.GetValue<string>("RedisConnection")));
             services.AddServices();
-            
+            //services.AddScoped<IPostQueries>(_ => new PostQueries(sql));
+            services.AddTransient<IPostQueries, PostQueries>();
+            var sqlConnectionConfiguration = new SqlConfiguration(Configuration.GetConnectionString("SocialMedia"));
+            services.AddSingleton(sqlConnectionConfiguration);
             services.AddSwagger($"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
             //Agregar autentication JWT
             services.AddAuthentication(o =>
@@ -77,16 +77,24 @@ namespace SocialMedia.Api
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Authentication:SecretKey"]))
                     };
                 });
-
             //Agregar un filtro de forma global
             services.AddMvc(o =>
             {
+                //test no se utiliza
                 o.Filters.Add<ValidationFilter>();
-            }).AddFluentValidation(o => 
+            }).AddFluentValidation(o =>
             {
                 //Registramos los Validator de Fluent Validator
                 o.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
             });
+            
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+
+            //configure autofac 
+            //var container = new ContainerBuilder();
+            //container.Populate(services);
+            //container.RegisterModule(new ApplicationModule(Configuration["SocialMedia"]));
+            //return new AutofacServiceProvider(container.Build());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

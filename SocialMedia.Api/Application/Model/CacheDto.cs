@@ -1,4 +1,4 @@
-﻿namespace SocialMedia.Core.DTOs
+﻿namespace SocialMedia.Api.Application.Model
 {
     public class CacheDto
     {

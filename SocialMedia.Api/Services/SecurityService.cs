@@ -1,11 +1,9 @@
-﻿using SocialMedia.Core.Entities;
+﻿using SocialMedia.Api.Interfaces;
+using SocialMedia.Core.Entities;
 using SocialMedia.Core.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace SocialMedia.Core.Services
+namespace SocialMedia.Api.Services
 {
     public class SecurityService : ISecurityService
     {

@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SocialMedia.Api.Application.Model;
+using SocialMedia.Api.Application.Queries;
+using SocialMedia.Api.Interfaces;
 using SocialMedia.Api.Responses;
 using SocialMedia.Core.CustomEntities;
-using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
-using SocialMedia.Core.Interfaces;
 using SocialMedia.Core.QueryFilters;
 using SocialMedia.Infrastructure.Interfaces;
 using System.Collections.Generic;
@@ -27,11 +28,13 @@ namespace SocialMedia.Api.Controllers
         private readonly IPostService _postService;
         private readonly IMapper _mapper;
         private readonly IUriService _uriService;
-        public PostController(IPostService postService, IMapper mapper, IUriService uriService)
+        private readonly IPostQueries _postQueries;
+        public PostController(IPostService postService, IMapper mapper, IUriService uriService, IPostQueries postQueries)
         {
             _postService = postService;
             _mapper = mapper;
             _uriService = uriService;
+            _postQueries = postQueries;
         }
         /// <summary>
         /// Retrieve All posts
@@ -71,8 +74,11 @@ namespace SocialMedia.Api.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPost(int id)
         {
-            var post = await _postService.GetPost(id);
-            var postDto = _mapper.Map<PostDto>(post);
+            //CQRS
+            var postDto = await _postQueries.GetPostById(id);
+            //Services
+            //var post = await _postService.GetPost(id);
+            //var postDto = _mapper.Map<PostDto>(post);
             var response = new ApiResponse<PostDto>(postDto);
             return Ok(response);
         }

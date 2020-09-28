@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using SocialMedia.Api.Application.Model;
+using SocialMedia.Api.Interfaces;
 using SocialMedia.Api.Responses;
-using SocialMedia.Core.DTOs;
 using SocialMedia.Core.Entities;
-using SocialMedia.Core.Enumerations;
-using SocialMedia.Core.Interfaces;
 using SocialMedia.Infrastructure.Interfaces;
+using System.Threading.Tasks;
 
 namespace SocialMedia.Api.Controllers
 {

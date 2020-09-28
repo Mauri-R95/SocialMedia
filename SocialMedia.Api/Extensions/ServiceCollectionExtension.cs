@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using SocialMedia.Api.Application.Queries;
+using SocialMedia.Api.Interfaces;
+using SocialMedia.Api.Services;
 using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.Interfaces;
-using SocialMedia.Core.Services;
 using SocialMedia.Infrastructure.BackgroundTasks;
 using SocialMedia.Infrastructure.Data;
 using SocialMedia.Infrastructure.Interfaces;
@@ -13,12 +15,9 @@ using SocialMedia.Infrastructure.Options;
 using SocialMedia.Infrastructure.Repositories;
 using SocialMedia.Infrastructure.Services;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using System.Text;
 
-namespace SocialMedia.Infrastructure.Extensions
+namespace SocialMedia.Api.Extensions
 {
     public static class ServiceCollectionExtension
     {
@@ -41,6 +40,7 @@ namespace SocialMedia.Infrastructure.Extensions
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             //Servicios
+            //services.AddTransient<IPostQueries, PostQueries>();
             services.AddTransient<IPostService, PostService>();
             services.AddTransient<ISecurityService, SecurityService>();
             services.AddTransient<IUserRepository, UserRepository>();

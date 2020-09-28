@@ -1,6 +1,6 @@
 ﻿using SocialMedia.Core.Enumerations;
 
-namespace SocialMedia.Core.DTOs
+namespace SocialMedia.Api.Application.Model
 {
     public class SecurityDto
     {

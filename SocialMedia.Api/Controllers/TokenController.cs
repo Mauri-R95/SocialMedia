@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using SocialMedia.Api.Interfaces;
 using SocialMedia.Core.Entities;
-using SocialMedia.Core.Interfaces;
 using SocialMedia.Infrastructure.Interfaces;
 using System;
 using System.IdentityModel.Tokens.Jwt;

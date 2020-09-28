@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using SocialMedia.Api.Interfaces;
 using SocialMedia.Core.CustomEntities;
 using SocialMedia.Core.Entities;
 using SocialMedia.Core.Exceptions;
@@ -8,7 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SocialMedia.Core.Services
+namespace SocialMedia.Api.Services
 {
     public class PostService : IPostService
     {
@@ -62,11 +63,11 @@ namespace SocialMedia.Core.Services
             var userPost = await _unitOfWork.PostRepository.GetPostsByUser(post.UserId);
             if(userPost.Count() < 10)
             {
-                var lastPost = userPost.OrderByDescending(x => x.Date).FirstOrDefault();
-                if((DateTime.Now - lastPost.Date).TotalDays < 7)
-                {
-                    throw new BusinessException("You are not able to publish the post");
-                }
+                //var lastPost = userPost.OrderByDescending(x => x.Date).FirstOrDefault();
+                //if((DateTime.Now - lastPost.Date).TotalDays < 7)
+                //{
+                //    throw new BusinessException("You are not able to publish the post");
+                //}
             }
             if (post.Description.Contains("sexo"))
             {
